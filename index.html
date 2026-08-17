@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moje Projekty</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+<style>
+  :root{
+    --bg:#0f1220;
+    --bg2:#161a2e;
+    --card:#1c2138;
+    --card2:#232a48;
+    --accent:#7c5cff;
+    --accent2:#ff5c9e;
+    --accent3:#4ce0d2;
+    --text:#f2f2fb;
+    --text-dim:#9a9fc0;
+    --border:rgba(255,255,255,0.08);
+    --shadow:rgba(0,0,0,0.5);
+    --nav-bg:rgba(20,22,40,0.85);
+    --success:#4ce0a0;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    background:
+      radial-gradient(circle at 20% -10%, rgba(124,92,255,0.25), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(255,92,158,0.15), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    padding-bottom:90px;
+    overflow-x:hidden;
+  }
+  header.top{
+    padding:28px 20px 14px;
+    text-align:center;
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:linear-gradient(180deg, var(--bg) 60%, rgba(15,18,32,0));
+    backdrop-filter:blur(6px);
+  }
+  header.top h1{
+    margin:0;
+    font-size:1.6rem;
+    font-weight:800;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    letter-spacing:0.5px;
+  }
+  header.top p{margin:6px 0 0; color:var(--text-dim); font-size:0.85rem;}
+
+  .tabs{
+    display:flex;
+    gap:10px;
+    padding:16px 20px 8px;
+    max-width:640px;
+    margin:0 auto;
+  }
+  .tab-btn{
+    flex:1;
+    padding:14px 10px;
+    border-radius:18px;
+    border:1px solid var(--border);
+    background:linear-gradient(145deg,var(--card2),var(--card));
+    color:var(--text);
+    font-size:0.95rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    cursor:pointer;
+    box-shadow:0 8px 20px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+    transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  }
+  .tab-btn .emoji{font-size:1.2rem;}
+  .tab-btn.active{
+    background:linear-gradient(145deg,var(--accent),#5c3dfb);
+    box-shadow:0 10px 28px rgba(124,92,255,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+    transform:translateY(-2px);
+  }
+  .tab-btn:active{transform:scale(0.96);}
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:8px 20px 20px;
+  }
+
+  .section-label{
+    color:var(--text-dim);
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    margin:18px 4px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  @media (min-width:480px){
+    .grid{grid-template-columns:1fr 1fr 1fr;}
+  }
+
+  .card{
+    position:relative;
+    border-radius:20px;
+    padding:18px 14px;
+    min-height:130px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    background:linear-gradient(155deg,var(--card2) 0%, var(--card) 100%);
+    border:1px solid var(--border);
+    box-shadow:
+      0 14px 30px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      inset 0 -12px 20px -14px rgba(0,0,0,0.6);
+    cursor:pointer;
+    transform-style:preserve-3d;
+    transition:transform .2s cubic-bezier(.2,.8,.3,1.3), box-shadow .2s ease;
+    text-decoration:none;
+    color:var(--text);
+    overflow:hidden;
+    animation:pop .35s ease backwards;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.10), transparent 55%);
+    pointer-events:none;
+  }
+  .card:active{
+    transform:scale(0.95) translateY(2px);
+    box-shadow:0 6px 14px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .card .icon{
+    font-size:1.8rem;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+  }
+  .card .name{
+    font-weight:700;
+    font-size:0.98rem;
+    line-height:1.25;
+    margin-top:10px;
+    word-break:break-word;
+  }
+  .card .cat{
+    margin-top:6px;
+    font-size:0.68rem;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+  .card .del{
+    position:absolute;
+    top:8px;
+    right:8px;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:rgba(255,92,110,0.15);
+    color:#ff5c6e;
+    border:1px solid rgba(255,92,110,0.3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.85rem;
+    z-index:2;
+  }
+  .card.app{border-top:3px solid var(--accent3);}
+  .card.site{border-top:3px solid var(--accent2);}
+
+  @keyframes pop{
+    from{opacity:0; transform:translateY(14px) scale(0.92);}
+    to{opacity:1; transform:translateY(0) scale(1);}
+  }
+
+  .empty{
+    text-align:center;
+    color:var(--text-dim);
+    padding:50px 20px;
+    font-size:0.95rem;
+  }
+  .empty .big{font-size:2.4rem; margin-bottom:10px;}
+
+  /* Bottom nav */
+  nav.bottom{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    z-index:20;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+    background:var(--nav-bg);
+    backdrop-filter:blur(16px);
+    border-top:1px solid var(--border);
+    box-shadow:0 -8px 30px var(--shadow);
+  }
+  .nav-item{
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    font-size:0.65rem;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:14px;
+    cursor:pointer;
+    transition:color .15s, background .15s, transform .15s;
+  }
+  .nav-item .ic{font-size:1.35rem;}
+  .nav-item.active{color:var(--text); background:rgba(124,92,255,0.18);}
+  .nav-item:active{transform:scale(0.9);}
+
+  .fab{
+    width:58px; height:58px;
+    border-radius:50%;
+    border:none;
+    background:linear-gradient(145deg,var(--accent),var(--accent2));
+    color:#fff;
+    font-size:1.8rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 10px 24px rgba(124,92,255,0.5);
+    cursor:pointer;
+    transform:translateY(-18px);
+    transition:transform .15s;
+    flex-shrink:0;
+  }
+  .fab:active{transform:translateY(-18px) scale(0.9);}
+
+  /* Modal */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(5,6,14,0.7);
+    backdrop-filter:blur(4px);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:50;
+    opacity:0; pointer-events:none;
+    transition:opacity .2s;
+  }
+  .overlay.show{opacity:1; pointer-events:auto;}
+  .sheet{
+    width:100%;
+    max-width:520px;
+    background:linear-gradient(160deg,var(--bg2),var(--bg));
+    border:1px solid var(--border);
+    border-bottom:none;
+    border-radius:26px 26px 0 0;
+    padding:22px 22px calc(26px + env(safe-area-inset-bottom));
+    transform:translateY(100%);
+    transition:transform .25s cubic-bezier(.2,.8,.3,1);
+    box-shadow:0 -20px 60px rgba(0,0,0,0.6);
+  }
+  .overlay.show .sheet{transform:translateY(0);}
+  .sheet h2{margin:0 0 16px; font-size:1.2rem;}
+  .sheet .handle{
+    width:40px; height:4px; border-radius:4px;
+    background:var(--border); margin:0 auto 16px;
+  }
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:0.78rem; color:var(--text-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;}
+  .field input, .field select{
+    width:100%;
+    padding:13px 14px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    font-size:0.95rem;
+    outline:none;
+  }
+  .field input:focus, .field select:focus{border-color:var(--accent);}
+  .type-toggle{display:flex; gap:10px;}
+  .type-toggle button{
+    flex:1;
+    padding:12px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text-dim);
+    font-weight:700;
+    cursor:pointer;
+  }
+  .type-toggle button.sel{
+    background:linear-gradient(145deg,var(--accent),#5c3dfb);
+    color:#fff;
+    border-color:transparent;
+  }
+  .emoji-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .emoji-row button{
+    width:44px; height:44px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:var(--card);
+    font-size:1.3rem;
+    cursor:pointer;
+  }
+  .emoji-row button.sel{border-color:var(--accent); background:var(--card2);}
+  .save-btn{
+    width:100%;
+    padding:15px;
+    border-radius:16px;
+    border:none;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;
+    font-weight:800;
+    font-size:1rem;
+    margin-top:6px;
+    cursor:pointer;
+    box-shadow:0 10px 24px rgba(124,92,255,0.4);
+  }
+  .save-btn:active{transform:scale(0.97);}
+  .cancel-link{
+    display:block;
+    text-align:center;
+    margin-top:12px;
+    color:var(--text-dim);
+    font-size:0.85rem;
+    background:none; border:none; width:100%;
+  }
+  .toast{
+    position:fixed;
+    bottom:100px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--card2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 18px;
+    border-radius:14px;
+    font-size:0.85rem;
+    opacity:0;
+    transition:opacity .25s, transform .25s;
+    z-index:60;
+    box-shadow:0 10px 24px var(--shadow);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🚀 Moje Projekty</h1>
+  <p>Wszystkie strony i aplikacje w jednym miejscu</p>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="all"><span class="emoji">🗂️</span> Wszystko</button>
+    <button class="tab-btn" data-tab="app"><span class="emoji">📱</span> Aplikacje</button>
+    <button class="tab-btn" data-tab="site"><span class="emoji">🌐</span> Strony</button>
+  </div>
+
+  <div id="content"></div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="handle"></div>
+    <h2>➕ Nowy projekt</h2>
+    <div class="field">
+      <label>Typ</label>
+      <div class="type-toggle">
+        <button type="button" id="typeApp" class="sel">📱 Aplikacja</button>
+        <button type="button" id="typeSite">🌐 Strona</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Nazwa</label>
+      <input id="inpName" type="text" placeholder="np. Kalkulator kalorii" maxlength="60">
+    </div>
+    <div class="field">
+      <label>Adres URL</label>
+      <input id="inpUrl" type="text" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>Ikonka</label>
+      <div class="emoji-row" id="emojiRow"></div>
+    </div>
+    <button class="save-btn" id="saveBtn">Zapisz projekt</button>
+    <button class="cancel-link" id="cancelBtn">Anuluj</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<nav class="bottom">
+  <button class="nav-item active" data-nav="all"><span class="ic">🗂️</span>Wszystko</button>
+  <button class="nav-item" data-nav="app"><span class="ic">📱</span>Aplikacje</button>
+  <button class="fab" id="addFab">+</button>
+  <button class="nav-item" data-nav="site"><span class="ic">🌐</span>Strony</button>
+  <button class="nav-item" data-nav="settings"><span class="ic">⚙️</span>Więcej</button>
+</nav>
+
+<script>
+const STORAGE_KEY = 'moje-projekty-v1';
+const EMOJIS = ['🚀','⭐','🔥','💡','🎯','📊','🛒','🎮','🍕','🏋️','🎨','🧮','📷','🗓️','💬','🎵','🏠','🔧'];
+
+let state = { tab:'all', pickedType:'app', pickedEmoji:'🚀' };
+
+function loadProjects(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  // domyślne przykładowe projekty - podmień lub usuń
+  return [];
+}
+function saveProjects(list){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+let projects = loadProjects();
+
+function render(){
+  const content = document.getElementById('content');
+  const filtered = state.tab === 'all' ? projects : projects.filter(p=>p.type===state.tab);
+
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===state.tab));
+  document.querySelectorAll('.nav-item[data-nav]').forEach(b=>b.classList.toggle('active', b.dataset.nav===state.tab));
+
+  if(filtered.length === 0){
+    content.innerHTML = `<div class="empty"><div class="big">📭</div>Brak projektów w tej kategorii.<br>Dodaj pierwszy klikając <b>+</b> na dole.</div>`;
+    return;
+  }
+
+  const groups = state.tab === 'all'
+    ? [['📱 Aplikacje','app'], ['🌐 Strony','site']]
+    : [[state.tab==='app'?'📱 Aplikacje':'🌐 Strony', state.tab]];
+
+  let html = '';
+  groups.forEach(([label,type])=>{
+    const items = filtered.filter(p=>p.type===type);
+    if(items.length===0) return;
+    html += `<div class="section-label">${label}</div><div class="grid">`;
+    items.forEach((p,idx)=>{
+      html += `
+        <a class="card ${p.type}" href="${escapeAttr(p.url)}" target="_blank" rel="noopener" style="animation-delay:${idx*0.03}s">
+          <button class="del" data-id="${p.id}" onclick="event.preventDefault();event.stopPropagation();removeProject('${p.id}')">✕</button>
+          <div class="icon">${p.emoji}</div>
+          <div>
+            <div class="name">${escapeHtml(p.name)}</div>
+            <div class="cat">${p.type==='app'?'Aplikacja':'Strona'}</div>
+          </div>
+        </a>`;
+    });
+    html += `</div>`;
+  });
+  content.innerHTML = html;
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+function removeProject(id){
+  if(!confirm('Usunąć ten projekt?')) return;
+  projects = projects.filter(p=>p.id!==id);
+  saveProjects(projects);
+  render();
+  showToast('Projekt usunięty');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ state.tab = btn.dataset.tab; render(); });
+});
+document.querySelectorAll('.nav-item[data-nav]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if(btn.dataset.nav === 'settings'){
+      if(confirm('Wyczyścić WSZYSTKIE projekty? Tej operacji nie można cofnąć.')){
+        projects = []; saveProjects(projects); render();
+      }
+      return;
+    }
+    state.tab = btn.dataset.nav; render();
+  });
+});
+
+// Modal logic
+const overlay = document.getElementById('overlay');
+const emojiRow = document.getElementById('emojiRow');
+EMOJIS.forEach(e=>{
+  const b = document.createElement('button');
+  b.type='button'; b.textContent=e;
+  if(e===state.pickedEmoji) b.classList.add('sel');
+  b.addEventListener('click', ()=>{
+    state.pickedEmoji = e;
+    emojiRow.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+  });
+  emojiRow.appendChild(b);
+});
+
+document.getElementById('addFab').addEventListener('click', openModal);
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+
+document.getElementById('typeApp').addEventListener('click', ()=>{
+  state.pickedType='app';
+  document.getElementById('typeApp').classList.add('sel');
+  document.getElementById('typeSite').classList.remove('sel');
+});
+document.getElementById('typeSite').addEventListener('click', ()=>{
+  state.pickedType='site';
+  document.getElementById('typeSite').classList.add('sel');
+  document.getElementById('typeApp').classList.remove('sel');
+});
+
+function openModal(){
+  document.getElementById('inpName').value='';
+  document.getElementById('inpUrl').value='';
+  state.pickedType='app'; state.pickedEmoji='🚀';
+  document.getElementById('typeApp').classList.add('sel');
+  document.getElementById('typeSite').classList.remove('sel');
+  emojiRow.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));
+  emojiRow.querySelector('button').classList.add('sel');
+  overlay.classList.add('show');
+  setTimeout(()=>document.getElementById('inpName').focus(), 200);
+}
+function closeModal(){ overlay.classList.remove('show'); }
+
+document.getElementById('saveBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('inpName').value.trim();
+  let url = document.getElementById('inpUrl').value.trim();
+  if(!name){ showToast('Podaj nazwę projektu'); return; }
+  if(!url){ showToast('Podaj adres URL'); return; }
+  if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const proj = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+    name, url,
+    type: state.pickedType,
+    emoji: state.pickedEmoji
+  };
+  projects.push(proj);
+  saveProjects(projects);
+  closeModal();
+  state.tab = state.tab==='settings' ? 'all' : state.tab;
+  render();
+  showToast('Projekt dodany ✔');
+});
+
+render();
+</script>
+</body>
+</html>
