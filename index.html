@@ -468,6 +468,50 @@
     font-size:0.85rem;
     background:none; border:none; width:100%;
   }
+
+  /* Dialog potwierdzenia usunięcia */
+  #confirmOverlay{ align-items:center; z-index:70; }
+  .confirm-sheet{
+    width:calc(100% - 48px);
+    max-width:340px;
+    border-radius:26px;
+    padding:26px 22px 20px;
+    text-align:center;
+    transform:scale(0.85);
+    opacity:0;
+    transition:transform .22s cubic-bezier(.2,.8,.3,1.15), opacity .18s ease;
+  }
+  #confirmOverlay.show .confirm-sheet{ transform:scale(1); opacity:1; }
+  .confirm-ic{
+    width:52px; height:52px;
+    margin:0 auto 14px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,92,110,0.16);
+    border:1px solid rgba(255,92,110,0.35);
+    color:#ff5c6e;
+  }
+  .confirm-ic svg.icon{width:22px; height:22px;}
+  .confirm-sheet h3{ margin:0 0 6px; font-size:1.05rem; }
+  .confirm-sheet p{ margin:0 0 20px; color:var(--text-dim); font-size:0.85rem; line-height:1.4; }
+  .confirm-actions{ display:flex; gap:10px; }
+  .confirm-cancel, .confirm-delete{
+    flex:1;
+    padding:13px 10px;
+    border-radius:14px;
+    font-weight:700;
+    font-size:0.9rem;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    color:var(--text);
+  }
+  .confirm-delete{
+    color:#fff;
+    background:
+      linear-gradient(155deg, rgba(255,255,255,0.25) 0%, rgba(255,92,110,0.85) 45%, rgba(255,92,110,0.7) 100%);
+    border-color:rgba(255,120,130,0.6);
+  }
+  .confirm-delete svg.icon{width:14px; height:14px;}
   .toast{
     position:fixed;
     bottom:100px; left:50%;
@@ -568,6 +612,18 @@
   </div>
 </div>
 
+<div class="overlay" id="confirmOverlay">
+  <div class="confirm-sheet glass">
+    <div class="confirm-ic"><svg class="icon"><use href="#ic-x"/></svg></div>
+    <h3 id="confirmTitle">Usunąć projekt?</h3>
+    <p id="confirmText">Tej operacji nie można cofnąć.</p>
+    <div class="confirm-actions">
+      <button class="confirm-cancel glass" id="confirmCancelBtn">Anuluj</button>
+      <button class="confirm-delete glass" id="confirmDeleteBtn"><svg class="icon"><use href="#ic-x"/></svg> Usuń</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <nav class="bottom">
@@ -656,13 +712,40 @@ function escapeHtml(s){
 }
 function escapeAttr(s){ return escapeHtml(s); }
 
-function removeProject(id){
-  if(!confirm('Usunąć ten projekt?')) return;
+async function removeProject(id){
+  const proj = projects.find(p=>p.id===id);
+  const ok = await showConfirm(
+    'Usunąć projekt?',
+    proj ? `Na pewno chcesz usunąć „${proj.name}”? Tej operacji nie można cofnąć.` : 'Tej operacji nie można cofnąć.'
+  );
+  if(!ok) return;
   projects = projects.filter(p=>p.id!==id);
   saveProjects(projects);
   render();
   showToast('Projekt usunięty');
 }
+
+// Niestandardowe okno potwierdzenia (zamiast systemowego confirm())
+const confirmOverlay = document.getElementById('confirmOverlay');
+const confirmTitleEl = document.getElementById('confirmTitle');
+const confirmTextEl = document.getElementById('confirmText');
+const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+let confirmResolve = null;
+
+function showConfirm(title, text){
+  confirmTitleEl.textContent = title;
+  confirmTextEl.textContent = text;
+  confirmOverlay.classList.add('show');
+  return new Promise(resolve=>{ confirmResolve = resolve; });
+}
+function closeConfirm(result){
+  confirmOverlay.classList.remove('show');
+  if(confirmResolve){ confirmResolve(result); confirmResolve = null; }
+}
+confirmCancelBtn.addEventListener('click', ()=>closeConfirm(false));
+confirmDeleteBtn.addEventListener('click', ()=>closeConfirm(true));
+confirmOverlay.addEventListener('click', e=>{ if(e.target===confirmOverlay) closeConfirm(false); });
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -677,11 +760,10 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{ state.tab = btn.dataset.tab; render(); });
 });
 document.querySelectorAll('.nav-item[data-nav]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
+  btn.addEventListener('click', async ()=>{
     if(btn.dataset.nav === 'settings'){
-      if(confirm('Wyczyścić WSZYSTKIE projekty? Tej operacji nie można cofnąć.')){
-        projects = []; saveProjects(projects); render();
-      }
+      const ok = await showConfirm('Wyczyścić wszystkie projekty?', 'Usuniesz całą listę. Tej operacji nie można cofnąć.');
+      if(ok){ projects = []; saveProjects(projects); render(); showToast('Lista wyczyszczona'); }
       return;
     }
     state.tab = btn.dataset.nav; render();
